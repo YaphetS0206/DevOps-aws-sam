@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'          # o 3.11, 3.13, etc.
-          cache: 'pip'                    # cachea dependencias → más rápido
+          cache: 'pip'                  
 
       # 3. Instalar dependencias
       - name: Instalar dependencias
