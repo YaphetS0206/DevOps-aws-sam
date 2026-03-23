@@ -1,0 +1,36 @@
+name: CI/CD Pipeline - Python
+
+on:
+  push:
+    branches: [main, develop, feature/*, hotfix/*]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  build-and-test:
+    name: Build → Install → Lint → Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Obtener el código del repositorio
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # 2. Configurar Python (elige tu versión)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'          # o 3.11, 3.13, etc.
+          cache: 'pip'                    # cachea dependencias → más rápido
+
+      # 3. Instalar dependencias
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          if [ -f pyproject.toml ] || [ -f setup.py ]; then
+            pip install -e ".[dev,test]"   # si usas poetry/pdm/hatch o setup.py con extras
+          fi
