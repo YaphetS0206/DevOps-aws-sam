@@ -42,7 +42,7 @@ jobs:
         # CKV_AWS_115 → concurrency not required in PoC
       - name: Security scan
         run: checkov -f template.yaml --skip-check CKV_AWS_117,CKV_AWS_116,CKV_AWS_115
-        
+
       - name: Run tests
         run: |
           echo "Add unit tests here"
@@ -67,7 +67,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sam-build
-          path: .aws-sam
+          path: .aws-sam/
+
+      - name: Debug build output
+        run: ls -la
 
 
   deploy:
