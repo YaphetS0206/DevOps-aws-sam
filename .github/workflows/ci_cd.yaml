@@ -1,36 +1,117 @@
-name: CI/CD Pipeline - Python
+name: App Serverless CI/CD (AWS SAM)
 
 on:
   push:
-    branches: [main, develop, feature/*, hotfix/*]
+    branches: [ "main" ]
   pull_request:
-    branches: [main]
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: us-east-1
+  STACK_NAME: sam-app
 
 jobs:
 
-  build-and-test:
-    name: Build → Install → Lint → Test
+  validate:
+    name: Validate & Test
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Obtener el código del repositorio
-      - name: Checkout código
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Configurar Python (elige tu versión)
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'    
-          cache: 'pip'                  
+          python-version: '3.11'
 
-      # 3. Instalar dependencias
-      - name: Instalar dependencias
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-          if [ -f pyproject.toml ] || [ -f setup.py ]; then
-            pip install -e ".[dev,test]"   # si usas poetry/pdm/hatch o setup.py con extras
-          fi
+          pip install aws-sam-cli cfn-lint checkov
+
+      - name: Validate SAM template
+        run: sam validate
+
+      - name: Lint CloudFormation
+        run: cfn-lint template.yaml
+
+      - name: Security scan (Checkov)
+        run: checkov -f template.yaml
+
+      - name: Run tests (placeholder)
+        run: |
+          echo "Run unit tests here"
+
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SAM CLI
+        run: pip install aws-sam-cli
+
+      - name: Build SAM app
+        run: sam build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sam-build
+          path: .aws-sam
+
+
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    permissions:
+      id-token: write   # 🔥 requerido para OIDC
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sam-build
+          path: .aws-sam
+
+      # 🔐 AUTH AWS (OIDC)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+         aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy SAM
+        run: |
+          sam deploy \
+            --stack-name $STACK_NAME \
+            --region $AWS_REGION \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --capabilities CAPABILITY_IAM
+
+      - name: Get API URL
+        id: api
+        run: |
+          API_URL=$(aws cloudformation describe-stacks \
+            --stack-name $STACK_NAME \
+            --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" \
+            --output text)
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+
+      - name: Post-deploy validation
+        run: |
+          echo "Testing endpoint..."
+          curl -f ${{ steps.api.outputs.api_url }}/hello
