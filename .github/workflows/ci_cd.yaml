@@ -111,7 +111,7 @@ jobs:
         run: |
           API_URL=$(aws cloudformation describe-stacks \
             --stack-name $STACK_NAME \
-            --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" \
+            --query "Stacks[0].Outputs[?OutputKey=='HelloApi'].OutputValue" \
             --output text)
 
           if [ -z "$API_URL" ]; then
