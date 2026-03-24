@@ -121,11 +121,31 @@ jobs:
 
           echo "api_url=$API_URL" >> $GITHUB_OUTPUT
 
+      - name: Debug outputs
+        run: |
+            aws cloudformation describe-stacks \
+            --stack-name $STACK_NAME \
+            --query "Stacks[0].Outputs"
+
       - name: Post-deploy validation
         run: |
-          echo "Testing endpoint..."
-          for i in {1..5}; do
-            curl -f ${{ steps.api.outputs.api_url }}/hello && break
-            echo "Retrying..."
+            URL=${{ steps.api.outputs.api_url }}
+
+            echo "Testing $URL"
+
+            for i in {1..5}; do
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" $URL)
+
+            if [ "$STATUS" -eq 200 ]; then
+                echo "Success!"
+                exit 0
+            fi
+
+            echo "Retrying... status=$STATUS"
             sleep 5
-          done
+            done
+
+            echo "Failed after retries"
+            exit 1
+
+      
