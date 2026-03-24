@@ -9,6 +9,7 @@ on:
 env:
   AWS_REGION: us-east-1
   STACK_NAME: sam-app
+  
 
 jobs:
 
@@ -30,7 +31,7 @@ jobs:
           pip install aws-sam-cli cfn-lint checkov
 
       - name: Validate SAM template
-        run: sam validate
+        run: sam validate --region $AWS_REGION
 
       - name: Lint CloudFormation
         run: cfn-lint template.yaml
