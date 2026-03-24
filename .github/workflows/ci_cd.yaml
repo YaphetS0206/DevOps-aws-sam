@@ -36,8 +36,15 @@ jobs:
       - name: Lint CloudFormation
         run: cfn-lint template.yaml
 
+     ## Ignored checks:
+        # CKV_AWS_117 → Lambda VPC (no requiere para el uso)
+        # CKV_AWS_116 → DLQ not needed for sync API
+        # CKV_AWS_115 → concurrency not required in PoC
       - name: Security scan
-        run: checkov -f template.yaml
+        run: checkov -f template.yaml \
+                --skip-check CKV_AWS_117 \ 
+                --skip-check CKV_AWS_116 \
+                --skip-check CKV_AWS_115
 
       - name: Run tests
         run: |
