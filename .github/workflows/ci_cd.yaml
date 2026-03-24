@@ -61,7 +61,7 @@ jobs:
         run: pip install aws-sam-cli
 
       - name: Build SAM app
-        run: sam build --use-container
+        run: sam build -t template.yaml
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
