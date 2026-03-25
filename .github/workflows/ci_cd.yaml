@@ -43,6 +43,12 @@ jobs:
       - name: Security scan (Bandit)
         run: bandit -r src/ -f json -o report.json
 
+      - name: Upload Bandit report
+        uses: actions/upload-artifact@v4
+        with:
+            name: bandit-report
+            path: report.json
+
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
 
