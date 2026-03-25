@@ -37,3 +37,7 @@ El pipeline está dividido en tres etapas principales:
     •   Autenticación con cuenta AWS
     •   Despliegue SAM.
 
+
+## Diagrama de Arquitectura
+
+![alt text](image.png)
