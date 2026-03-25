@@ -24,13 +24,13 @@ El pipeline está dividido en tres etapas principales:
     •	Litting de la infraestructura 
     •	Escaneo de seguridad utilizando Chevkov
 
-##🏗️ 2. Build
+## 🏗️ 2. Build
 
     •   Construcción de la aplicación
     •   Generación del artefacto:
     •   Guardar el artefacto en memoria - github actions
 
-##🚀 3. Deploy
+## 🚀 3. Deploy
 
     •   Descargar el artefacto guardado
     •   Ejecución de comando para el deploy
