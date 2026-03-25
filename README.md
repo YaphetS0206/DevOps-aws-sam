@@ -40,4 +40,4 @@ El pipeline está dividido en tres etapas principales:
 
 ## Diagrama de Arquitectura
 
-![alt text](image.png)
+![alt text](image-1.png)
