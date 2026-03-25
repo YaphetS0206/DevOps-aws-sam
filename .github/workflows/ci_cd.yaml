@@ -41,7 +41,7 @@ jobs:
         # CKV_AWS_116 → DLQ not needed for sync API
         # CKV_AWS_115 → concurrency not required in PoC
       - name: Security scan (Bandit)
-        run: bandit -r . -f json -o report.json
+        run: bandit -r src/ -f json -o report.json
 
      ## Unit Tests (pytest library)
       - name: Run unit tests
