@@ -33,7 +33,7 @@ jobs:
       - name: Validate SAM template
         run: sam validate --region $AWS_REGION
 
-      - name: Lint CloudFormation
+      - name: Lint CloudFormation.  ## validacion de sintaxis y mejores prácticas
         run: cfn-lint template.yaml
 
      ## Ignored checks:
