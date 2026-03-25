@@ -1,4 +1,4 @@
-#🚀 App Serverless CI/CD con AWS SAM y GitHub Actions
+# 🚀 App Serverless CI/CD con AWS SAM y GitHub Actions
 
 📌 Descripción:
 
@@ -6,7 +6,7 @@ Este proyecto implementa una aplicación serverless en AWS utilizando AWS SAM (S
 
 El objetivo es demostrar buenas prácticas de DevSecOps y automatización, incluyendo validaciones, análisis de seguridad, despliegue continuo y validación post deploy.
 
-#🧱 Arquitectura
+# 🧱 Arquitectura
 
 La solución está compuesta por:
 	•	AWS Lambda → Función backend
@@ -14,11 +14,11 @@ La solución está compuesta por:
 	•	AWS CloudFormation (SAM) → Infraestructura como código 
 	•	GitHub Actions → Pipeline CI/CD
 
-#⚙️ Flujo del Pipeline
+# ⚙️ Flujo del Pipeline
 
 El pipeline está dividido en tres etapas principales: 
 
-##🧪 1. Validate & Security Checks
+## 🧪 1. Validate & Security Checks
     •	Descargar el repositorio
     •	Validación del template 
     •	Litting de la infraestructura 
