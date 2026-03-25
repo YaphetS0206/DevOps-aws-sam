@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install aws-sam-cli cfn-lint checkov
+          pip install aws-sam-cli cfn-lint checkov pytest bandit
 
       - name: Validate SAM template
         run: sam validate --region $AWS_REGION
@@ -40,12 +40,12 @@ jobs:
         # CKV_AWS_117 → Lambda VPC (no requiere para el uso)
         # CKV_AWS_116 → DLQ not needed for sync API
         # CKV_AWS_115 → concurrency not required in PoC
-      - name: Security scan
-        run: checkov -f template.yaml --skip-check CKV_AWS_117,CKV_AWS_116,CKV_AWS_115
+      - name: Security scan (Bandit)
+        run: bandit -r src/
 
-      - name: Run tests
-        run: |
-          echo "Add unit tests here"
+     ## Unit Tests (pytest library)
+      - name: Run unit tests
+        run: pytest
 
 
   build:
@@ -127,7 +127,7 @@ jobs:
             --stack-name $STACK_NAME \
             --query "Stacks[0].Outputs"
 
-      - name: Post-deploy validation
+      - name: Post-deploy validation test
         run: |
             URL=${{ steps.api.outputs.api_url }}
 
@@ -137,15 +137,15 @@ jobs:
             STATUS=$(curl -o /dev/null -s -w "%{http_code}" $URL)
 
             if [ "$STATUS" -eq 200 ]; then
-                echo "Success!"
+                echo "Integration test passed ✅"
                 exit 0
             fi
 
-            echo "Retrying... status=$STATUS"
+            echo "Retrying..."
             sleep 5
             done
 
-            echo "Failed after retries"
+            echo "Integration test failed ❌"
             exit 1
 
       
