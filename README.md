@@ -96,7 +96,7 @@ El endpoint se valida automáticamente en el pipeline mediante:
 
 ```bash
 curl https://<api-url>
-
+```
 
 
 ## Diagrama de Arquitectura
